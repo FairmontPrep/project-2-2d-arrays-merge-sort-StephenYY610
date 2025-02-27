@@ -2,85 +2,164 @@ import javax.swing.*;
 import java.awt.*;
 
 public class GameBoard extends JFrame {
-    private static final int SIZE = 8;
-    private JPanel[][] squares = new JPanel[SIZE][SIZE];
-    private ImageIcon exampleIcon;
-    public String[][] piecesArray;
-
+    public int Width = 8;
+    public int Height = 8;
+    public int SquareSize = 80;
+    private JPanel[][] squares = new JPanel[Width][Height];
+    private String[][] piecesArray;
 
     public GameBoard() {
-        setTitle("Chess Board");
-        setSize(600, 600);
+        setTitle("Valorant");
+        setSize(Width * SquareSize, Height * SquareSize);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(SIZE, SIZE));
+        setLayout(new GridLayout(Height, Width));
 
-       
-
-        // create your 2d Array to store your image variables and assign positions
-        // add your code here
-        // this line of code initializes a new 2D Array of Strings the size of 1 row and 2 columns
-        // your 2D array must be a minimum of 6 rows x 2 columns
-        // you may add a row for every image if you'd like to have every square be a different color/image
-
-        piecesArray = new String[1][2];
-        piecesArray[0][0]= "temp2.png";
-        piecesArray[0][1]= "HP:200";
-
-        //print the contents of your 2D array
-        //this is a requirement to show your 2D array is not sorted at the beginning of your program
-
-        for (int i = 0; i < piecesArray.length; i++) {
-            for (int j = 0; j < piecesArray[i].length; j++) {
-                System.out.println("piecesArray[" + i + "][" + j + "] = " + piecesArray[i][j]);
+        for (int y = 0; y < Height; y++) {
+            for (int x = 0; x < Width; x++) {
+                squares[x][y] = new JPanel();
+                squares[x][y].setPreferredSize(new Dimension(SquareSize, SquareSize));
+                squares[x][y].setBackground(Color.WHITE);
+                add(squares[x][y]);
             }
         }
 
-        exampleIcon = new ImageIcon(piecesArray[0][0]); // Load image file
-
-        initializeBoard();
+        piecesArray = new String[Width * Height][2];
+        loadPieces();
+        populateBoard();
     }
 
-    private void initializeBoard() {
-        for (int row = 0; row < SIZE; row++) {
-            for (int col = 0; col < SIZE; col++) {
-                squares[row][col] = new JPanel(new BorderLayout());
-
-                // creates the checkered pattern with the two colors
-                // you can add more colors or take away any you'd like
-                
-                if (row >= 2 && row <= 5) {
-                    squares[row][col].setBackground(new Color(139, 69, 19)); // brown
-                } else if ((row + col) % 2 == 0) {
-                    squares[row][col].setBackground(new Color(55, 255, 55)); //dark green
-                } else {
-                    squares[row][col].setBackground(new Color(200, 255, 200)); //lighter green
-                }
+    private int getNumber(int x, int y) {
+        return y * Width + x;
+    }
 
 
-                // this is where your sorting method will be called 
-                // you will use the column 2 values to arrange your images to the board
-                // be sure to sort them before you add them onto the board 
-                // you will use a loop to add to your 2D Array, below is an example of how to add ONE image to ONE square
-                
-                // Adding an image to specific positions (e.g., first row)
-                if (row == 0 && col==0) {
-                    Image scaledImage = exampleIcon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
-                    JLabel pieceLabel = new JLabel(new ImageIcon(scaledImage));
-                    JLabel textLabel = new JLabel(piecesArray[0][1], SwingConstants.CENTER);
-                    squares[row][col].add(pieceLabel, BorderLayout.CENTER);
-                    squares[row][col].add(textLabel, BorderLayout.SOUTH);
-                }
+    private void populateBoard() {
+    for (int y = 0; y < Height; y++) {
+        for (int x = 0; x < Width; x++) {
+            int index = getNumber(x, y);
+            String imagePath = piecesArray[index][0];
+            JLabel label = new JLabel();
+            label.setHorizontalAlignment(SwingConstants.CENTER);
 
-                
-                add(squares[row][col]);
+            if (!imagePath.equals("#FFFFFF")) {
+                ImageIcon icon = new ImageIcon(imagePath);
+                Image image = icon.getImage();
+                Image scaledImage = image.getScaledInstance(SquareSize, SquareSize, Image.SCALE_SMOOTH);
+                label.setIcon(new ImageIcon(scaledImage));
+            }
+
+            squares[x][y].removeAll();
+            squares[x][y].setLayout(new BorderLayout());  // Ensure the label is properly centered
+            squares[x][y].add(label, BorderLayout.CENTER);
+        }
+    }
+    revalidate();
+    repaint();
+}
+
+    private void loadPieces() {
+        
+        // Red
+        int[][] redCoords = {{1,2},{7,2},{1,3},{2,3},{6,3},{7,3},{1,4},{2,4},{3,4},{5,4},{6,4},{7,4},{2,5},{3,5},{4,5},{3,6},{4,6},{5,6}};
+        String defaultImagePath = "red.png";
+        for (int[] coord : redCoords) {
+            int num = getNumber(coord[0] - 1, coord[1] - 1); // Adjust for 0-based indexing
+            piecesArray[num][0] = defaultImagePath; // Black hex code
+            piecesArray[num][1] = String.valueOf(num);
+        }
+
+
+        // Black
+        int[][] blackCoords = {{2,2},{8,2},{3,3},{8,3},{4,4},{8,4},{5,5}};
+        defaultImagePath = "black.png";
+        for (int[] coord : blackCoords) {
+            int num = getNumber(coord[0] - 1, coord[1] - 1); // Adjust for 0-based indexing
+            piecesArray[num][0] = defaultImagePath; // Black hex code
+            piecesArray[num][1] = String.valueOf(num);
+        }
+
+
+        // LetterV
+        int[][] letterVCoords = {{1,8}};
+        defaultImagePath = "v.png";
+        for (int[] coord : letterVCoords) {
+            int num = getNumber(coord[0] - 1, coord[1] - 1); // Adjust for 0-based indexing
+            piecesArray[num][0] = defaultImagePath; // Dark Grey hex code
+            piecesArray[num][1] = String.valueOf(num);
+        }
+
+
+        // LetterA
+        int[][] letterACoords = {{2,8},{6,8}};
+        defaultImagePath = "a.png";
+        for (int[] coord : letterACoords) {
+            int num = getNumber(coord[0] - 1, coord[1] - 1); // Adjust for 0-based indexing
+            piecesArray[num][0] = defaultImagePath; // Dark Grey hex code
+            piecesArray[num][1] = String.valueOf(num);
+        }
+
+
+        // LetterL
+        int[][] letterLCoords = {{3,8}};
+        defaultImagePath = "l.png";
+        for (int[] coord : letterLCoords) {
+            int num = getNumber(coord[0] - 1, coord[1] - 1); // Adjust for 0-based indexing
+            piecesArray[num][0] = defaultImagePath; // Dark Grey hex code
+            piecesArray[num][1] = String.valueOf(num);
+        }
+
+
+        // LetterO
+        int[][] letterOCoords = {{4,8}};
+        defaultImagePath = "o.png";
+        for (int[] coord : letterOCoords) {
+            int num = getNumber(coord[0] - 1, coord[1] - 1); // Adjust for 0-based indexing
+            piecesArray[num][0] = defaultImagePath; // Dark Grey hex code
+            piecesArray[num][1] = String.valueOf(num);
+        }
+
+
+        // LetterR
+        int[][] letterRCoords = {{5,8}};
+        defaultImagePath = "r.png";
+        for (int[] coord : letterRCoords) {
+            int num = getNumber(coord[0] - 1, coord[1] - 1); // Adjust for 0-based indexing
+            piecesArray[num][0] = defaultImagePath; // Dark Grey hex code
+            piecesArray[num][1] = String.valueOf(num);
+        }
+
+
+        // LetterN
+        int[][] letterNCoords = {{7,8}};
+        defaultImagePath = "n.png";
+        for (int[] coord : letterNCoords) {
+            int num = getNumber(coord[0] - 1, coord[1] - 1); // Adjust for 0-based indexing
+            piecesArray[num][0] = defaultImagePath; // Dark Grey hex code
+            piecesArray[num][1] = String.valueOf(num);
+        }
+
+
+        // letterT
+        int[][] letterTCoords = {{8,8}};
+        defaultImagePath = "t.png";
+        for (int[] coord : letterTCoords) {
+            int num = getNumber(coord[0] - 1, coord[1] - 1); // Adjust for 0-based indexing
+            piecesArray[num][0] = defaultImagePath; // Dark Grey hex code
+            piecesArray[num][1] = String.valueOf(num);
+        }
+
+
+
+        // Fill remaining slots with "Empty"
+        for (int i = 0; i < Width * Height; i++) {
+            if (piecesArray[i][0] == null) {
+                piecesArray[i][0] = "#FFFFFF"; // Default to white for empty slots
+                piecesArray[i][1] = String.valueOf(i);
             }
         }
     }
 
 
-    // add your merge sort method here
-    // add a comment to every line of code that describes what the line is accomplishing
-    // your mergeSort method does not have to return any value
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
